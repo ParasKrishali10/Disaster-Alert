@@ -1,0 +1,60 @@
+
+           0       0.87      0.89      0.88      1144
+           1       0.88      0.86      0.87      1145
+           2       0.87      0.88      0.88      1148
+
+    accuracy                           0.87      3437
+   macro avg       0.87      0.87      0.87      3437
+weighted avg       0.87      0.87      0.87      3437
+
+
+Model saved at: models/xgboost_landslide_model.pkl
+
+Plots saved in 'plots/' folder
+
+ssification Report:
+              precision    recall  f1-score   support
+
+           0       0.87      0.89      0.88      1144
+           1       0.88      0.86      0.87      1145
+           2       0.87      0.88      0.88      1148
+
+    accuracy                           0.88      3437
+   macro avg       0.88      0.88      0.88      3437
+weighted avg       0.88      0.88      0.88      3437
+
+
+Model saved at: models/random_forest_landslide_model.pkl
+
+          precision    recall  f1-score   support
+
+           0       0.85      0.89      0.87      1144
+           1       0.88      0.81      0.85      1145
+           2       0.86      0.88      0.87      1148
+
+    accuracy                           0.86      3437
+   macro avg       0.86      0.86      0.86      3437
+weighted avg       0.86      0.86      0.86      3437
+
+
+Model saved at: models/svm_landslide_model.pkl
+Scaler saved at: models/scaler.pkl
+
+Hybrid Model Accuracy: 0.8751818446319465
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.87      0.89      0.88      1144
+           1       0.88      0.86      0.87      1145
+           2       0.87      0.88      0.88      1148
+
+    accuracy                           0.88      3437
+   macro avg       0.88      0.88      0.88      3437
+weighted avg       0.88      0.88      0.88      3437
+
+
+Hybrid model saved at models/hybrid_landslide_model.pkl
+(venv) 
+
+

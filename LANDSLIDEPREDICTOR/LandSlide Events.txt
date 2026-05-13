@@ -1,0 +1,62 @@
+| ID | Date       | Approx Time | Location               | District    | Lat    | Lon    |
+| -- | ---------- | ----------- | ---------------------- | ----------- | ------ | ------ |
+| 1  | 18-08-1998 | 03:00       | Malpa                  | Pithoragarh | 30.116 | 80.733 |
+| 2  | 19-08-1998 | 02:30       | Dharchula road         | Pithoragarh | 30.006 | 80.528 |
+| 3  | 20-07-2001 | 14:00       | Bhatwari               | Uttarkashi  | 30.735 | 78.445 |
+| 4  | 11-09-2002 | 05:00       | Balganga valley        | Tehri       | 30.389 | 78.480 |
+| 5  | 24-08-2005 | 16:30       | Lambagad               | Chamoli     | 30.742 | 79.487 |
+| 6  | 02-08-2007 | 11:00       | Karnaprayag road       | Chamoli     | 30.258 | 79.215 |
+| 7  | 17-08-2008 | 13:30       | Pithoragarh town slope | Pithoragarh | 29.583 | 80.218 |
+| 8  | 18-09-2009 | 09:45       | Mori valley            | Uttarkashi  | 31.009 | 78.194 |
+| 9  | 12-07-2010 | 15:00       | Ukhimath               | Rudraprayag | 30.526 | 79.075 |
+| 10 | 16-08-2010 | 04:30       | Joshimath road         | Chamoli     | 30.555 | 79.565 |
+| 11 | 13-09-2012 | 06:15       | Okhimath               | Rudraprayag | 30.508 | 79.058 |
+| 12 | 17-06-2013 | 01:30       | Kedarnath valley       | Rudraprayag | 30.735 | 79.067 |
+| 13 | 17-06-2013 | 04:00       | Rambara                | Rudraprayag | 30.733 | 79.059 |
+| 14 | 18-06-2013 | 07:30       | Gaurikund              | Rudraprayag | 30.652 | 79.020 |
+| 15 | 20-06-2013 | 12:00       | Govindghat             | Chamoli     | 30.623 | 79.565 |
+| 16 | 21-06-2013 | 16:00       | Badrinath highway      | Chamoli     | 30.743 | 79.493 |
+| 17 | 05-08-2014 | 10:30       | Tehri road cut slope   | Tehri       | 30.375 | 78.480 |
+| 18 | 19-07-2015 | 14:00       | Kapkot road            | Bageshwar   | 29.916 | 79.889 |
+| 19 | 01-08-2015 | 17:30       | Dharasu bend           | Uttarkashi  | 30.719 | 78.425 |
+| 20 | 12-07-2016 | 06:30       | Bastadi village        | Pithoragarh | 29.742 | 80.204 |
+| 21 | 22-07-2016 | 08:00       | Yamunotri road         | Uttarkashi  | 31.014 | 78.454 |
+| 22 | 14-08-2017 | 11:15       | Munsiyari road         | Pithoragarh | 30.072 | 80.238 |
+| 23 | 17-08-2017 | 18:30       | Bageshwar highway      | Bageshwar   | 29.840 | 79.769 |
+| 24 | 03-07-2018 | 09:20       | Raini village slope    | Chamoli     | 30.558 | 79.616 |
+| 25 | 19-08-2018 | 15:40       | Dharchula road         | Pithoragarh | 30.006 | 80.542 |
+| 26 | 04-07-2019 | 07:50       | Barkot highway         | Uttarkashi  | 30.807 | 78.203 |
+| 27 | 19-08-2019 | 12:30       | Harsil valley          | Uttarkashi  | 31.038 | 78.734 |
+| 28 | 08-07-2020 | 10:20       | Chamoli town slope     | Chamoli     | 30.404 | 79.320 |
+| 29 | 14-08-2020 | 13:00       | Joshimath bypass       | Chamoli     | 30.556 | 79.564 |
+| 30 | 07-02-2021 | 10:45       | Rishiganga valley      | Chamoli     | 30.491 | 79.718 |
+| 31 | 07-02-2021 | 11:15       | Tapovan                | Chamoli     | 30.541 | 79.566 |
+| 32 | 10-07-2021 | 14:00       | Bhanerpani (NH-7)      | Chamoli     | 30.490 | 79.420 |
+| 33 | 18-10-2021 | 08:30       | Pagal Nala             | Chamoli     | 30.670 | 79.550 |
+| 34 | 19-10-2021 | 12:10       | Nainital slope         | Nainital    | 29.391 | 79.454 |
+| 35 | 03-07-2022 | 09:00       | Jakholi                | Rudraprayag | 30.352 | 78.990 |
+| 36 | 17-07-2022 | 16:20       | Yamunotri route        | Uttarkashi  | 31.015 | 78.460 |
+| 37 | 02-08-2022 | 18:10       | Kapkot valley          | Bageshwar   | 29.915 | 79.889 |
+| 38 | 05-08-2022 | 07:40       | Tehri slope            | Tehri       | 30.381 | 78.480 |
+| 39 | 11-07-2023 | 08:10       | Kedarnath route        | Rudraprayag | 30.731 | 79.066 |
+| 40 | 21-07-2023 | 14:45       | Joshimath slope        | Chamoli     | 30.555 | 79.565 |
+| 41 | 05-08-2023 | 16:30       | Pipalkoti highway      | Chamoli     | 30.425 | 79.430 |
+| 42 | 13-08-2023 | 19:20       | Dharasu bend           | Uttarkashi  | 30.718 | 78.426 |
+| 43 | 24-08-2023 | 11:15       | Almora-Haldwani road   | Almora      | 29.655 | 79.433 |
+| 44 | 02-07-2024 | 09:40       | Gaurikund              | Rudraprayag | 30.652 | 79.020 |
+| 45 | 07-07-2024 | 12:30       | Badrinath highway      | Chamoli     | 30.743 | 79.493 |
+| 46 | 18-07-2024 | 15:10       | Kwarab slope           | Nainital    | 29.523 | 79.542 |
+| 47 | 23-06-2025 | 10:00       | Yamunotri trek route   | Uttarkashi  | 31.015 | 78.460 |
+| 48 | 05-08-2025 | 11:20       | Dharali                | Uttarkashi  | 31.035 | 78.735 |
+| 49 | 05-08-2025 | 12:00       | Harsil valley          | Uttarkashi  | 31.038 | 78.734 |
+| 50 | 06-08-2025 | 14:10       | Gangotri road          | Uttarkashi  | 30.994 | 78.940 |
+| 51 | 12-08-2025 | 09:30       | Bageshwar rural road   | Bageshwar   | 29.837 | 79.771 |
+| 52 | 18-08-2025 | 17:15       | Dharchula highway      | Pithoragarh | 30.006 | 80.542 |
+| 53 | 23-08-2025 | 13:10       | Joshimath slope        | Chamoli     | 30.555 | 79.565 |
+| 54 | 28-08-2025 | 11:30       | Pipalkoti              | Chamoli     | 30.425 | 79.430 |
+| 55 | 31-08-2025 | 08:50       | Tehri hillside         | Tehri       | 30.381 | 78.480 |
+| 56 | 04-09-2025 | 16:00       | Kapkot valley          | Bageshwar   | 29.915 | 79.889 |
+| 57 | 10-09-2025 | 12:40       | Barkot road            | Uttarkashi  | 30.807 | 78.203 |
+| 58 | 14-09-2025 | 07:20       | Rudraprayag highway    | Rudraprayag | 30.284 | 78.980 |
+| 59 | 20-09-2025 | 15:50       | Pithoragarh slope      | Pithoragarh | 29.583 | 80.218 |
+| 60 | 25-09-2025 | 09:10       | Chamoli valley         | Chamoli     | 30.404 | 79.320 |

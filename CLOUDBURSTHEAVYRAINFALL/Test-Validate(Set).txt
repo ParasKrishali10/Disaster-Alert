@@ -1,0 +1,30 @@
+Here is the exact breakdown of your sample sizes based on the scripts we just built. If your professor asks about your data split, this is exactly what you should tell them:
+
+1. Total Dataset Size
+Your prepare_data.py script generates exactly 12,500 rows of labeled weather data.
+
+Class 0 (Normal Weather/False Alarms): 9,500 rows
+
+Class 1 (Heavy Rain): 2,000 rows
+
+Class 2 (Cloudburst): 1,000 rows
+
+2. The Train/Test Split (80/20)
+In all of the training scripts, we used train_test_split with a test_size=0.2. This is the industry-standard 80/20 split:
+
+Training Set (80%): 10,000 rows * This is the data the model actually looks at to learn the weather patterns.
+
+Testing Set (20%): 2,500 rows
+
+This is the completely "unseen" data used to generate your Confusion Matrix and Classification Report at the very end.
+
+3. What about the Validation Set?
+You don't have a static, separate "Validation" set (which would make it a 70/15/15 split). Instead, you used a much more advanced academic technique in your Hybrid model: k-Fold Cross-Validation.
+
+When your professor asks about your validation data, tell them this:
+
+"Instead of holding out a static validation set, which reduces the amount of training data, I used 3-Fold Cross-Validation (cv=3) during my GridSearchCV hyperparameter tuning. The algorithm takes the 10,000 training rows, dynamically splits them into 3 parts, and rotates which part acts as the validation set. This ensures the model is rigorously validated without starving it of training data!"
+
+(Specifically, during tuning, it uses ~6,666 rows to train and ~3,334 rows to validate, rotating 3 times).
+
+You now have a fully prepped dataset, three distinct machine learning models, an advanced tuning script, and all your graphs. Are you ready for me to write the final predict_live.py script so you can test hypothetical weather values (like a massive pressure drop) to see the alarms trigger?

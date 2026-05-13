@@ -1,0 +1,51 @@
+event_id,date,location,district,latitude,longitude,event_type
+1,1998-08-18,Malpa,Pithoragarh,30.1667,80.7500,landslide_flash_flood
+2,2003-08-16,Kedarnath,Rudraprayag,30.7352,79.0669,heavy_rain
+3,2004-07-05,Chamoli Valley,Chamoli,30.4050,79.3200,cloudburst
+4,2005-08-09,Dharasu,Uttarkashi,30.7260,78.4430,cloudburst
+5,2006-07-28,Munsiyari,Pithoragarh,30.0670,80.2380,heavy_rain
+6,2007-07-11,Ghansali,Tehri Garhwal,30.3810,78.6620,cloudburst
+7,2007-08-14,Badrinath,Chamoli,30.7433,79.4938,flash_flood
+8,2008-08-04,Karnaprayag,Chamoli,30.2590,79.2180,heavy_rain
+9,2009-08-07,Dunda,Uttarkashi,30.7300,78.6000,flash_flood
+10,2010-08-06,Uttarkashi,Uttarkashi,30.7290,78.4430,cloudburst
+11,2011-07-13,Ukhimath,Rudraprayag,30.5270,79.0970,heavy_rain
+12,2012-08-04,Didihat,Pithoragarh,29.7890,80.2590,cloudburst
+13,2013-06-16,Kedarnath Valley,Rudraprayag,30.7352,79.0669,flash_flood
+14,2013-06-17,Gaurikund,Rudraprayag,30.6340,79.0220,flash_flood
+15,2013-06-18,Rambara,Rudraprayag,30.7250,79.0610,flash_flood
+16,2013-06-19,Joshimath,Chamoli,30.5569,79.5647,heavy_rain
+17,2014-08-03,Badrinath,Chamoli,30.7433,79.4938,heavy_rain
+18,2015-07-29,Dharali,Uttarkashi,31.0410,78.2600,cloudburst
+19,2016-05-08,Tharali,Chamoli,30.3940,79.3300,heavy_rain
+20,2016-05-08,Karnaprayag,Chamoli,30.2590,79.2180,heavy_rain
+21,2017-06-30,Uttarkashi,Uttarkashi,30.7290,78.4430,cloudburst
+22,2017-07-03,Bhatwari,Uttarkashi,30.7790,78.6140,cloudburst
+23,2017-07-18,Hari Maharaj Parvat,Uttarkashi,30.9850,78.4200,cloudburst
+24,2017-08-02,Pandukeshwar,Chamoli,30.6850,79.4980,flash_flood
+25,2018-05-02,Narayanbagar,Chamoli,30.3260,79.4720,cloudburst
+26,2018-07-17,Kotdwar,Pauri Garhwal,29.7460,78.5210,heavy_rain
+27,2018-07-19,Joshimath,Chamoli,30.5569,79.5647,cloudburst
+28,2019-07-18,Tehri Lake Region,Tehri Garhwal,30.3720,78.4800,heavy_rain
+29,2019-08-18,Arakot,Uttarkashi,30.8900,78.2300,cloudburst
+30,2019-08-20,Mori,Uttarkashi,31.0000,78.3500,flash_flood
+31,2020-08-11,Dharchula,Pithoragarh,29.8480,80.5380,flash_flood
+32,2020-08-20,Pithoragarh Hills,Pithoragarh,29.5820,80.2180,heavy_rain
+33,2021-02-07,Raini Village,Chamoli,30.5050,79.7200,flash_flood
+34,2021-07-18,Uttarkashi Hills,Uttarkashi,30.7290,78.4430,cloudburst
+35,2021-08-12,Bageshwar,Bageshwar,29.8380,79.7710,heavy_rain
+36,2021-10-17,Nainital,Nainital,29.3919,79.4542,extreme_rainfall
+37,2022-07-20,Devprayag,Tehri Garhwal,30.1460,78.5980,heavy_rain
+38,2022-08-18,Pauri Hills,Pauri Garhwal,30.1480,78.7800,cloudburst
+39,2023-07-15,Kedarnath Route,Rudraprayag,30.7350,79.0700,heavy_rain
+40,2023-08-14,Pauri Hills,Pauri Garhwal,30.1480,78.7800,cloudburst
+41,2023-08-22,Gangotri Valley,Uttarkashi,30.9940,78.9390,heavy_rain
+42,2024-07-05,Badrinath Valley,Chamoli,30.7433,79.4938,heavy_rain
+43,2024-07-16,Munsiyari,Pithoragarh,30.0670,80.2380,cloudburst
+44,2024-08-02,Kedarnath Valley,Rudraprayag,30.7352,79.0669,cloudburst
+45,2025-06-29,Yamunotri Highway,Uttarkashi,31.0140,78.4500,cloudburst
+46,2025-08-05,Dharali,Uttarkashi,31.0410,78.2600,flash_flood
+47,2025-08-05,Sukhi Top,Uttarkashi,31.0500,78.3000,cloudburst
+48,2025-09-15,Sahastradhara,Dehradun,30.3870,78.0990,cloudburst
+49,2025-07-04,Harsil,Uttarkashi,31.0420,78.2600,flash_flood
+50,2025-07-12,Gangotri Valley,Uttarkashi,30.9940,78.9390,heavy_rain
