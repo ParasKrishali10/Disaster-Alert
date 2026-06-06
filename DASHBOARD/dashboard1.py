@@ -6,7 +6,7 @@ import requests
 import os
 import ee
 from datetime import datetime
-
+from streamlit_geolocation import streamlit_geolocation
 # ==========================================
 # 1. ENTERPRISE DIRECTORY CONFIGURATION
 # ==========================================
@@ -55,7 +55,7 @@ ee_ready, ee_error = init_ee()
 @st.cache_resource
 def load_all_assets():
     assets = {'FF': {}, 'CB': {}, 'LS': {}, 'scaler': None}
-    
+
     # --- Forest Fire ---
     ff_files = {'Random Forest': 'forest_fire_rf_model.pkl', 'XGBoost': 'forest_fire_xgb_model.pkl', 'MLP Neural Net': 'forest_fire_mlp_model.pkl', 'Hybrid Ensemble': 'forest_fire_hybrid_model.pkl'}
     for name, f in ff_files.items():
@@ -73,7 +73,7 @@ def load_all_assets():
     for name, f in ls_files.items():
         try: assets['LS'][name] = joblib.load(os.path.join(LS_MODELS_DIR, f))
         except: pass
-        
+
     try: assets['scaler'] = joblib.load(os.path.join(LS_MODELS_DIR, 'scaler.pkl'))
     except Exception as e: st.error(f"Failed to load Landslide Scaler: {e}")
 
@@ -112,8 +112,29 @@ st.markdown("### AI-Driven Risk Assessment for Forest Fires, Cloudbursts, and La
 
 st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Uttarakhand_Emblem.png/180px-Uttarakhand_Emblem.png", width=100)
 st.sidebar.header("📍 System Target Coordinates")
-latitude = st.sidebar.number_input("Target Latitude", value=30.1459, format="%.4f")
-longitude = st.sidebar.number_input("Target Longitude", value=78.7672, format="%.4f")
+
+# latitude = st.sidebar.number_input("Target Latitude", value=30.1459, format="%.4f")
+# longitude = st.sidebar.number_input("Target Longitude", value=78.7672, format="%.4f")
+
+location = streamlit_geolocation()
+
+
+
+if location and location["latitude"] is not None:
+    latitude = location["latitude"]
+    longitude = location["longitude"]
+
+    st.sidebar.success("Location detected")
+    st.sidebar.write(f"Lat: {latitude:.6f}")
+    st.sidebar.write(f"Lon: {longitude:.6f}")
+
+else:
+    st.sidebar.warning("Allow location access in your browser")
+    latitude = 30.1459
+    longitude = 78.7672
+
+
+
 st.sidebar.markdown("---")
 
 if not ee_ready:
@@ -127,17 +148,17 @@ assets = load_all_assets()
 # ==========================================
 if st.sidebar.button("INITIATE MULTI-HAZARD ANALYSIS", type="primary", use_container_width=True):
     with st.spinner("Synchronizing Satellite & Atmospheric Telemetry..."):
-        
+
         gee_data = get_unified_gee(latitude, longitude)
         weather_data = get_unified_weather(latitude, longitude)
-        
+
         if not weather_data:
             st.error("Atmospheric API disconnected. Please try again.")
             st.stop()
 
         elev, slope, aspect, ndvi = gee_data
         month = datetime.now().month
-        
+
         temp = weather_data['temperature_2m_max']
         rain = weather_data['precipitation_sum']
         hum = weather_data['relative_humidity_2m_max']
@@ -160,16 +181,16 @@ if st.sidebar.button("INITIATE MULTI-HAZARD ANALYSIS", type="primary", use_conta
         # --- FOREST FIRE ---
         fdi = (max_t_today * wind_today) / (hum_today + 1)
         ff_input = pd.DataFrame({
-            'Month': [float(month)], 'Rain_7d_Sum': [float(r7_sum)], 'Temp_7d_Avg': [float(t7_avg)], 
-            'Fire_Danger_Index': [float(fdi)], 'Max_Temperature_C': [float(max_t_today)], 'Max_Humidity_pct': [float(hum_today)], 
-            'Total_Rainfall_mm': [float(rain_today)], 'Max_Wind_Speed_kmh': [float(wind_today)], 'Elevation_m': [float(elev)], 
+            'Month': [float(month)], 'Rain_7d_Sum': [float(r7_sum)], 'Temp_7d_Avg': [float(t7_avg)],
+            'Fire_Danger_Index': [float(fdi)], 'Max_Temperature_C': [float(max_t_today)], 'Max_Humidity_pct': [float(hum_today)],
+            'Total_Rainfall_mm': [float(rain_today)], 'Max_Wind_Speed_kmh': [float(wind_today)], 'Elevation_m': [float(elev)],
             'Slope_deg': [float(slope)], 'Aspect_deg': [float(aspect)], 'Baseline_NDVI': [float(ndvi)]
         }).values
 
         # --- CLOUDBURST ---
         cb_input = pd.DataFrame({
-            'Month': [float(month)], 'Rain_7d_Sum': [float(r7_sum)], 'Temp_7d_Avg': [float(t7_avg)], 
-            'Max_Temperature_C': [float(max_t_today)], 'Max_Humidity_pct': [float(hum_today)], 'Total_Rainfall_mm': [float(rain_today)], 
+            'Month': [float(month)], 'Rain_7d_Sum': [float(r7_sum)], 'Temp_7d_Avg': [float(t7_avg)],
+            'Max_Temperature_C': [float(max_t_today)], 'Max_Humidity_pct': [float(hum_today)], 'Total_Rainfall_mm': [float(rain_today)],
             'Elevation_m': [float(elev)], 'Slope_deg': [float(slope)], 'Aspect_deg': [float(aspect)]
         }).values
 
@@ -178,12 +199,12 @@ if st.sidebar.button("INITIATE MULTI-HAZARD ANALYSIS", type="primary", use_conta
         rain_slope = r7_sum * slope
         ls_input = pd.DataFrame({
             'Elevation_m': [elev], 'Slope_deg': [slope], 'Baseline_NDVI': [ndvi],
-            'Rainfall_Day_0_mm': [rain_today], 'Rainfall_Antecedent_3D_mm': [r3_sum], 'Rainfall_Antecedent_7D_mm': [r7_sum], 
+            'Rainfall_Day_0_mm': [rain_today], 'Rainfall_Antecedent_3D_mm': [r3_sum], 'Rainfall_Antecedent_7D_mm': [r7_sum],
             'Rainfall_Antecedent_15D_mm': [r15_sum], 'Soil_Moisture_Surface': [surf_m_today], 'Soil_Moisture_Deep': [deep_m_today],
-            'Month_Sin': [np.sin(2 * np.pi * month / 12)], 'Month_Cos': [np.cos(2 * np.pi * month / 12)], 
-            'Aspect_Sin': [np.sin(np.radians(aspect))], 'Aspect_Cos': [np.cos(np.radians(aspect))], 
+            'Month_Sin': [np.sin(2 * np.pi * month / 12)], 'Month_Cos': [np.cos(2 * np.pi * month / 12)],
+            'Aspect_Sin': [np.sin(np.radians(aspect))], 'Aspect_Cos': [np.cos(np.radians(aspect))],
             'Soil_Moisture_Gradient': [soil_grad], 'Rain_Slope_Interaction': [rain_slope], 'Total_15D_Water_Load': [r15_sum + deep_m_today],
-            'Rain_norm': [rain_today / 100.0], 'Slope_norm': [slope / 90.0], 'Moisture_norm': [surf_m_today], 
+            'Rain_norm': [rain_today / 100.0], 'Slope_norm': [slope / 90.0], 'Moisture_norm': [surf_m_today],
             'Risk_Score': [(r7_sum * slope) / 100.0], 'random_noise_feature': [np.random.rand()]
         }).values
 
@@ -202,7 +223,7 @@ if st.sidebar.button("INITIATE MULTI-HAZARD ANALYSIS", type="primary", use_conta
         # ==========================================
         st.markdown("### 📡 MASTER THREAT MATRIX")
         col1, col2, col3 = st.columns(3)
-        
+
         with col1:
             if pred_ff == 3: st.markdown('<div class="threat-extreme"><h3>🚨 FOREST FIRE</h3><p>EXTREME IGNITION PROBABILITY</p></div>', unsafe_allow_html=True)
             elif pred_ff == 2: st.markdown('<div class="threat-high"><h3>⚠️ FOREST FIRE</h3><p>HIGH FIRE DANGER CONDITIONS</p></div>', unsafe_allow_html=True)

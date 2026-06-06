@@ -6,7 +6,8 @@ import requests
 import os
 import ee
 from datetime import datetime
-
+from streamlit_geolocation import streamlit_geolocation
+# from streamlit_geolocation import streamlit_geolocation
 # --- DIRECTORY CONFIGURATION ---
 MODELS_DIR = r"D:\FINALYEARPROJECT\CLOUDBURSTHEAVYRAINFALL\models"
 DASHBOARD_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -32,7 +33,7 @@ def init_ee():
         key_file_path = os.path.join(DASHBOARD_DIR, 'ee-key.json')
         if not os.path.exists(key_file_path):
              return False, f"Key file not found at: {key_file_path}"
-             
+
         credentials = ee.ServiceAccountCredentials('', key_file_path)
         ee.Initialize(credentials, project='lofty-inn-490212-m9')
         return True, None
@@ -50,7 +51,7 @@ def load_models():
         'SVM Model': 'model_svm.pkl',
         'Tuned Hybrid': 'model_hybrid_tuned.pkl'
     }
-    
+
     for name, filename in model_files.items():
         path = os.path.join(MODELS_DIR, filename)
         try:
@@ -78,19 +79,40 @@ def get_weather_data(lat, lon):
     try:
         r = requests.get(url).json()['daily']
         return (
-            r['temperature_2m_max'][7], 
-            r['relative_humidity_2m_max'][7], 
-            r['precipitation_sum'][7], 
-            np.mean(r['temperature_2m_max'][:7]), 
+            r['temperature_2m_max'][7],
+            r['relative_humidity_2m_max'][7],
+            r['precipitation_sum'][7],
+            np.mean(r['temperature_2m_max'][:7]),
             np.sum(r['precipitation_sum'][:7])
         )
     except:
         return None
 
-# --- SIDEBAR ---
-st.sidebar.header("📍 Targeting Coordinates")
-latitude = st.sidebar.number_input("Latitude", value=30.1459, format="%.4f")
-longitude = st.sidebar.number_input("Longitude", value=78.7672, format="%.4f")
+# --- MANUAL SIDEBAR ---
+# st.sidebar.header("📍 Targeting Coordinates")
+# latitude = st.sidebar.number_input("Latitude", value=30.1459, format="%.4f")
+# longitude = st.sidebar.number_input("Longitude", value=78.7672, format="%.4f")
+
+# --- REAL TIME SIDEBAR ---
+st.sidebar.header("📍 Current Location")
+
+
+
+location = streamlit_geolocation()
+
+if location and location["latitude"] is not None:
+    latitude = location["latitude"]
+    longitude = location["longitude"]
+
+    st.sidebar.success("Location detected")
+    st.sidebar.write(f"Lat: {latitude:.6f}")
+    st.sidebar.write(f"Lon: {longitude:.6f}")
+
+else:
+    st.sidebar.warning("Allow location access in your browser")
+    latitude = 30.1459
+    longitude = 78.7672
+
 
 # --- EXECUTION ---
 if not ee_ready:
@@ -98,14 +120,14 @@ if not ee_ready:
 else:
     if st.sidebar.button("Run Risk Assessment", type="primary"):
         with st.spinner("Extracting environmental telemetry..."):
-            
+
             gee = get_gee_data(latitude, longitude)
             weath = get_weather_data(latitude, longitude)
-            
+
             if weath:
                 max_t, hum, rain, t7_avg, r7_sum = weath
                 month = datetime.now().month
-                
+
                 # ==========================================================
                 # THE 9-FEATURE FIX (Matches model training exactly)
                 # ==========================================================
@@ -129,16 +151,16 @@ else:
                 st.markdown("---")
 
                 models = load_models()
-                
+
                 if models and 'Tuned Hybrid' in models:
                     risk_map = {0: 'Stable/Normal Weather', 1: 'Heavy Rainfall Risk', 2: 'Cloudburst Warning'}
-                    
+
                     try:
                         # Pass raw numeric matrix to avoid indexing errors
                         input_matrix = live_input.values
-                        
+
                         final_pred = models['Tuned Hybrid'].predict(input_matrix)[0]
-                        
+
                         if final_pred == 2:
                             st.markdown('<div class="alert-extreme"><h1>🚨 CLOUDBURST WARNING</h1><p class="big-font">Extreme atmospheric instability. Precautionary protocols recommended.</p></div>', unsafe_allow_html=True)
                         elif final_pred == 1:
@@ -151,6 +173,6 @@ else:
                         for i, (name, model) in enumerate(models.items()):
                             m_pred = model.predict(input_matrix)[0]
                             m_cols[i].info(f"**{name}**\n\n{risk_map[m_pred]}")
-                            
+
                     except Exception as e:
                          st.error(f"Analysis Crash: {e}")
