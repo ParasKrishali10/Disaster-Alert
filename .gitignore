@@ -1,1 +1,3 @@
 DASHBOARD/ee-key.json
+DASHBOARD/.streamlit/secrets.toml
+.streamlit/secrets.toml

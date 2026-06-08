@@ -7,6 +7,105 @@ import os
 import ee
 from datetime import datetime
 from streamlit_geolocation import streamlit_geolocation
+from twilio.rest import Client
+
+# Defining the sos route
+
+def send_sos_alert(latitude, longitude, alerts: list):
+    try:
+        client = Client(
+            st.secrets["TWILIO_ACCOUNT_SID"],
+            st.secrets["TWILIO_AUTH_TOKEN"]
+        )
+
+        alert_lines = "\n".join(
+            [f"🔴 {a['hazard']}: {a['level']} — {a['detail']}" for a in alerts]
+        )
+
+        # --- Fetch safe zones for the message ---
+        api_key = st.secrets["GEOAPIFY_API_KEY"]
+        safezone_lines = ""
+        maps_search_url = ""
+
+        try:
+            # Determine search category based on hazard
+            hazard_names = [a["hazard"] for a in alerts]
+            if any("FIRE" in h for h in hazard_names):
+                category = "healthcare.hospital,service.fire_station,service.police"
+                search_term = "hospital+fire+station+near"
+            elif any("RAIN" in h or "CLOUD" in h for h in hazard_names):
+                category = "healthcare.hospital,education.school,activity.community_center,service.police"
+                search_term = "hospital+shelter+near"
+            else:
+                category = "healthcare.hospital,service.police,education.school"
+                search_term = "hospital+police+near"
+            url = (
+                f"https://api.geoapify.com/v2/places"
+                f"?categories={category}"
+                f"&filter=circle:{longitude},{latitude},30000"
+                f"&limit=5"
+                f"&apiKey={api_key}"
+            )
+            r = requests.get(url, timeout=10).json()
+            places = []
+            for feature in r.get("features", []):
+                props = feature.get("properties", {})
+                coords = feature.get("geometry", {}).get("coordinates", [None, None])
+                name = props.get("name") or props.get("address_line1") or "Safe Zone"
+                dist = round(props.get("distance", 0) / 1000, 1)
+                p_lat, p_lon = coords[1], coords[0]
+                if name and p_lat and p_lon:
+                    places.append({
+                        "name": name,
+                        "lat": p_lat,
+                        "lon": p_lon,
+                        "dist": dist
+                    })
+
+            if places:
+                # Build safe zone lines for SMS
+                safezone_lines = "\n🛡️ NEAREST SAFE ZONES:\n"
+                for i, p in enumerate(places[:5], 1):
+                    nav_url = f"https://www.google.com/maps/dir/{latitude},{longitude}/{p['lat']},{p['lon']}"
+                    safezone_lines += f"{i}. {p['name']} ({p['dist']} km)\n   ↳ Navigate: {nav_url}\n"
+
+                # Build a Google Maps search URL that shows all safe zones near location
+                # Uses /search/ which pins results on map
+                hazard_key = "FIRE"      if any("FIRE"  in h for h in hazard_names) else \
+                 "RAINFALL"  if any("RAIN"  in h or "CLOUD" in h for h in hazard_names) else \
+                 "LANDSLIDE" if any("LAND"  in h for h in hazard_names) else \
+                 "GENERAL"
+
+                maps_search_url = (
+        f"https://paraskrishali10.github.io/-disaster-map/"
+        f"?lat={latitude}&lon={longitude}&hazard={hazard_key}"
+    )
+
+            else:
+                maps_search_url = f"https://maps.google.com/?q={latitude},{longitude}"
+
+
+        except Exception as e:
+            maps_search_url = f"https://maps.google.com/?q={latitude},{longitude}"
+            safezone_lines = "\n⚠️ Safe zone data unavailable.\n"
+            st.warning(f"Safe zone fetch error: {e}")  # ← ADD THIS
+        body = (
+            f"SOS ALERT\n"
+            f"Location: {latitude:.4f},{longitude:.4f}\n"
+            f"Threats: {', '.join(a['hazard'] for a in alerts[:3])}\n"
+            f"Map: {maps_search_url}"
+        )
+
+        message = client.messages.create(
+              body=body,
+    from_=st.secrets["TWILIO_FROM_NUMBER"],
+    to=st.secrets["ALERT_TO_NUMBER"]
+        )
+
+        return True, message.sid
+
+    except Exception as e:
+        return False, str(e)
 # ==========================================
 # 1. ENTERPRISE DIRECTORY CONFIGURATION
 # ==========================================
@@ -213,7 +312,7 @@ if st.sidebar.button("INITIATE MULTI-HAZARD ANALYSIS", type="primary", use_conta
         else:
             ls_input_scaled = None
 
-        # --- PREDICTIONS ---
+       # --- PREDICTIONS ---
         pred_ff = assets['FF']['Hybrid Ensemble'].predict(ff_input)[0] if 'Hybrid Ensemble' in assets['FF'] else -1
         pred_cb = assets['CB']['Tuned Hybrid'].predict(cb_input)[0] if 'Tuned Hybrid' in assets['CB'] else -1
         pred_ls = assets['LS']['Hybrid Stacking'].predict(ls_input_scaled)[0] if ls_input_scaled is not None and 'Hybrid Stacking' in assets['LS'] else -1
@@ -240,8 +339,84 @@ if st.sidebar.button("INITIATE MULTI-HAZARD ANALYSIS", type="primary", use_conta
             elif pred_ls == 1: st.markdown('<div class="threat-high"><h3>⚠️ LANDSLIDE</h3><p>ELEVATED MOISTURE & STRAIN</p></div>', unsafe_allow_html=True)
             else: st.markdown('<div class="threat-low"><h3>✅ TERRAIN</h3><p>GEOLOGICALLY STABLE</p></div>', unsafe_allow_html=True)
 
+        # ==========================================
+        # SOS ALERT LOGIC
+        # ==========================================
+       # ==========================================
+        # SOS ALERT LOGIC — checks Hybrid + any base model
+        # ==========================================
+        active_alerts = []
+
+        # --- Forest Fire: Hybrid primary, fallback to any base model ---
+        ff_map_rev = {0: 'Low', 1: 'Moderate', 2: 'High', 3: 'Extreme'}
+        ff_base_preds = {name: model.predict(ff_input)[0] for name, model in assets['FF'].items()}
+        ff_any_high = any(v >= 2 for v in ff_base_preds.values())  # any model says High/Extreme
+
+        if pred_ff == 3:
+            active_alerts.append({"hazard": "FOREST FIRE", "level": "EXTREME",
+                                   "detail": f"Hybrid: Extreme | Base models: {', '.join(f'{k}={ff_map_rev[v]}' for k,v in ff_base_preds.items())}"})
+        elif pred_ff == 2:
+            active_alerts.append({"hazard": "FOREST FIRE", "level": "HIGH",
+                                   "detail": f"Hybrid: High | Base models: {', '.join(f'{k}={ff_map_rev[v]}' for k,v in ff_base_preds.items())}"})
+        elif ff_any_high:
+            triggering = [k for k, v in ff_base_preds.items() if v >= 2]
+            active_alerts.append({"hazard": "FOREST FIRE", "level": "HIGH (BASE MODEL)",
+                                   "detail": f"Triggered by: {', '.join(triggering)} | Hybrid: Low/Moderate"})
+
+        # --- Cloudburst: Hybrid primary, fallback to any base model ---
+        cb_map_rev = {0: 'Normal', 1: 'Heavy Rain', 2: 'Cloudburst'}
+        cb_base_preds = {name: model.predict(cb_input)[0] for name, model in assets['CB'].items()}
+        cb_any_high = any(v >= 1 for v in cb_base_preds.values())  # any model says Heavy Rain or worse
+
+        if pred_cb == 2:
+            active_alerts.append({"hazard": "CLOUDBURST", "level": "CRITICAL",
+                                   "detail": f"Hybrid: Cloudburst | Base models: {', '.join(f'{k}={cb_map_rev[v]}' for k,v in cb_base_preds.items())}"})
+        elif pred_cb == 1:
+            active_alerts.append({"hazard": "HEAVY RAINFALL", "level": "ELEVATED",
+                                   "detail": f"Hybrid: Heavy Rain | Base models: {', '.join(f'{k}={cb_map_rev[v]}' for k,v in cb_base_preds.items())}"})
+        elif cb_any_high:
+            triggering = [k for k, v in cb_base_preds.items() if v >= 1]
+            active_alerts.append({"hazard": "HEAVY RAINFALL", "level": "ELEVATED (BASE MODEL)",
+                                   "detail": f"Triggered by: {', '.join(triggering)} | Hybrid: Normal"})
+
+        # --- Landslide: Hybrid primary, fallback to any base model ---
+        ls_map_rev = {0: 'Stable', 1: 'Moderate Risk', 2: 'High Risk'}
+        if ls_input_scaled is not None:
+            ls_base_preds = {name: model.predict(ls_input_scaled)[0] for name, model in assets['LS'].items()}
+            ls_any_high = any(v >= 1 for v in ls_base_preds.values())
+        else:
+            ls_base_preds = {}
+            ls_any_high = False
+
+        if pred_ls == 2:
+            active_alerts.append({"hazard": "LANDSLIDE", "level": "CRITICAL",
+                                   "detail": f"Hybrid: High Risk | Base models: {', '.join(f'{k}={ls_map_rev[v]}' for k,v in ls_base_preds.items())}"})
+        elif pred_ls == 1:
+            active_alerts.append({"hazard": "LANDSLIDE", "level": "ELEVATED",
+                                   "detail": f"Hybrid: Moderate Risk | Base models: {', '.join(f'{k}={ls_map_rev[v]}' for k,v in ls_base_preds.items())}"})
+        elif ls_any_high:
+            triggering = [k for k, v in ls_base_preds.items() if v >= 1]
+            active_alerts.append({"hazard": "LANDSLIDE", "level": "ELEVATED (BASE MODEL)",
+                                   "detail": f"Triggered by: {', '.join(triggering)} | Hybrid: Stable"})
+
         st.markdown("---")
 
+        if active_alerts:
+            st.error(f"🚨 {len(active_alerts)} ACTIVE THREAT(S) DETECTED — SOS ALERT TRIGGERED")
+            with st.spinner("📡 Transmitting SOS Alert via Twilio..."):
+                success, result = send_sos_alert(latitude, longitude, active_alerts)
+            if success:
+                st.success(f"✅ SOS SMS sent! Message SID: `{result}`")
+                try:
+                    debug_client = Client(st.secrets["TWILIO_ACCOUNT_SID"], st.secrets["TWILIO_AUTH_TOKEN"])
+                    msg = debug_client.messages(result).fetch()
+                    st.info(f"**Twilio Status:** `{msg.status}` | **Error:** `{msg.error_message}`")
+                except Exception as debug_err:
+                    st.warning(f"Could not fetch status: {debug_err}")
+            else:
+                st.warning(f"⚠️ Alert transmission failed: {result}")
+        else:
+            st.success("✅ No critical threats detected. No SOS alert required.")
         # ==========================================
         # 9. RAW TELEMETRY DATA EXPANDER (EXPANDED)
         # ==========================================
